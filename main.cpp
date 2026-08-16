@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <optional>
 #include <stdexcept>
 #include <vector>
 
@@ -26,6 +27,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include "VulkanDebugMessenger.h"
 #include "VulkanInstance.h"
 
 namespace
@@ -107,7 +109,19 @@ void Run()
 
         const VulkanInstance instance{GetRequiredExtensions()};
 
+        // NOTE:
+        // メッセンジャーはインスタンスに属するため、インスタンスより後に生成する.
+        // ローカル変数は生成と逆の順で破棄されるので、破棄はメッセンジャーが先になる.
+        // この順序が崩れると、破棄済みのインスタンスを参照することになる.
+        std::optional<VulkanDebugMessenger> debugMessenger{};
+
+        if (instance.IsValidationEnabled())
+        {
+            debugMessenger.emplace(instance.Get());
+        }
+
         std::cout << "Vulkan インスタンスを生成しました." << std::endl;
+        std::cout << "バリデーション: " << (instance.IsValidationEnabled() ? "有効" : "無効") << std::endl;
 
         while (glfwWindowShouldClose(window) == GLFW_FALSE)
         {
