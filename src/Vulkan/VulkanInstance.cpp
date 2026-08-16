@@ -29,12 +29,21 @@
 VulkanInstance::VulkanInstance(const std::vector<const char*>& requiredExtensions)
 {
     const bool isValidationRequested = VulkanDebugMessenger::IsRequested();
+    const ValidationLayerAvailability availability = VulkanDebugMessenger::GetAvailability();
 
-    m_IsValidationEnabled = isValidationRequested && VulkanDebugMessenger::IsAvailable();
+    m_IsValidationEnabled = isValidationRequested && availability == ValidationLayerAvailability::AVAILABLE;
 
-    if (isValidationRequested && !m_IsValidationEnabled)
+    // NOTE:
+    // どちらの理由でも検査なしで続行するが、利用者に伝える内容は変える.
+    // 「見つからない」と「調べられなかった」では次に取るべき対処が違うため.
+    if (isValidationRequested && availability == ValidationLayerAvailability::NOT_FOUND)
     {
         std::cerr << "[Vulkan] バリデーションレイヤーが見つかりません. 検査なしで続行します." << std::endl;
+    }
+
+    if (isValidationRequested && availability == ValidationLayerAvailability::QUERY_FAILED)
+    {
+        std::cerr << "[Vulkan] レイヤーの有無を確認できませんでした. 検査なしで続行します." << std::endl;
     }
 
     // 要求された拡張に、デバッグメッセンジャー用の拡張を足す.
