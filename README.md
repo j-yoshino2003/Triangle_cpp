@@ -89,11 +89,32 @@ Visual Studio で `cpp.slnx` を開いてビルドするか、`cpp/` で次を�
 ./x64/Debug/cpp.exe
 ```
 
-環境が正しければ、コンソールに拡張の数が出てウィンドウが開く。
+環境が正しければ、コンソールに次の 2 行が出てウィンドウが開く。
 
 ```
-Vulkan instance extensions: 20
+Vulkan インスタンスを生成しました.
+バリデーション: 有効
 ```
+
+Debug ビルドではバリデーションレイヤーが有効になり、Vulkan の使い方に誤りがあると
+標準エラーへ `[Vulkan] ...` の形で報告される。
+
+## ファイル構成
+
+1 つのラッパークラスが 1 つの資源だけを持ち、破棄はデストラクターに任せる（Rule of 5）。
+利用側の `Application` は資源をメンバーとして並べるだけで済む（Rule of 0）。
+
+| ファイル | 受け持つもの |
+|------|------|
+| `main.cpp` | エントリーポイント。コンソールの文字コード設定と例外の受け止めだけ |
+| `Application.*` | 資源をまとめて持ち、ウィンドウが閉じられるまで回し続ける |
+| `GlfwContext.*` | GLFW の初期化状態（`glfwInit` / `glfwTerminate`） |
+| `GlfwWindow.*` | ウィンドウ（`glfwCreateWindow` / `glfwDestroyWindow`） |
+| `VulkanInstance.*` | `VkInstance` |
+| `VulkanDebugMessenger.*` | `VkDebugUtilsMessengerEXT` とバリデーションレイヤーの判断 |
+
+`Application` のメンバーは**宣言順に生成され、逆順に破棄される**。依存される側を前に、
+依存する側を後ろに並べておけば、破棄の順序は自動的に正しくなる。
 
 ## 開発時の注意
 

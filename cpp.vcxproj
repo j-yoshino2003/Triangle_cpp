@@ -155,11 +155,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="GlfwContext.cpp" />
+    <ClCompile Include="GlfwWindow.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="VulkanDebugMessenger.cpp" />
     <ClCompile Include="VulkanInstance.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="GlfwContext.h" />
+    <ClInclude Include="GlfwWindow.h" />
     <ClInclude Include="VulkanDebugMessenger.h" />
     <ClInclude Include="VulkanInstance.h" />
   </ItemGroup>

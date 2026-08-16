@@ -15,6 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="GlfwContext.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="GlfwWindow.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -26,6 +35,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="GlfwContext.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="GlfwWindow.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
     <ClInclude Include="VulkanDebugMessenger.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
