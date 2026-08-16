@@ -20,13 +20,15 @@
 Application::Application()
     : m_Window{WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE}, m_Instance{m_Glfw.GetRequiredInstanceExtensions()}
 {
-    if (m_Instance.IsValidationEnabled())
+    const bool isValidationEnabled = m_Instance.IsValidationEnabled();
+
+    if (isValidationEnabled)
     {
         m_DebugMessenger.emplace(m_Instance.Get());
     }
 
     std::cout << "Vulkan インスタンスを生成しました." << std::endl;
-    std::cout << "バリデーション: " << (m_Instance.IsValidationEnabled() ? "有効" : "無効") << std::endl;
+    std::cout << "バリデーション: " << (isValidationEnabled ? "有効" : "無効") << std::endl;
 }
 
 /// <summary>
