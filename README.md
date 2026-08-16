@@ -1,1 +1,1 @@
-# Triangle-cpp
+# Triangle_cpp
