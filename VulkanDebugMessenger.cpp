@@ -31,7 +31,7 @@ namespace
 /// <param name="_Type">メッセージの種類.</param>
 /// <param name="_CallbackData">メッセージ本体.</param>
 /// <param name="_UserData">利用者が登録した任意のデータ. 今は使わない.</param>
-/// <returns>常に VK_FALSE. VK_TRUE を返すと呼び出し元の Vulkan 関数が中断される.</returns>
+/// <returns>VK_TRUE = 呼び出し元の Vulkan 関数を中断する、VK_FALSE = 続行する.</returns>
 VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT _Severity,
                                              const VkDebugUtilsMessageTypeFlagsEXT _Type,
                                              const VkDebugUtilsMessengerCallbackDataEXT* const _CallbackData,
@@ -54,7 +54,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(const VkDebugUtilsMessageSeverityFl
 /// <summary>
 /// バリデーションによる検査を行いたい状況かどうかを返す.
 /// </summary>
-/// <returns>デバッグビルドなら true.</returns>
+/// <returns>true = 検査を行う（デバッグビルド）、false = 行わない（リリースビルド）.</returns>
 bool VulkanDebugMessenger::IsRequested()
 {
     // NOTE:
@@ -69,7 +69,7 @@ bool VulkanDebugMessenger::IsRequested()
 /// <summary>
 /// バリデーションレイヤーがこの環境に存在するかどうかを返す.
 /// </summary>
-/// <returns>存在すれば true.</returns>
+/// <returns>true = この環境に存在する、false = 存在しない.</returns>
 bool VulkanDebugMessenger::IsAvailable()
 {
     uint32_t layerCount{};

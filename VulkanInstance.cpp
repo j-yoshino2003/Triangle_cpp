@@ -126,7 +126,7 @@ VkInstance VulkanInstance::Get() const
 /// <summary>
 /// バリデーションレイヤーを有効にして生成できたかどうかを返す.
 /// </summary>
-/// <returns>有効なら true.</returns>
+/// <returns>true = 有効になっている、false = なっていない.</returns>
 bool VulkanInstance::IsValidationEnabled() const
 {
     return m_IsValidationEnabled;
