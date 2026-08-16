@@ -10,7 +10,8 @@ Vulkan で三角形を描画する C++ 実装。Rust 実装は同リポジトリ
 | Vulkan SDK | 1.4.357.0 | `C:\VulkanSDK\1.4.357.0` |
 | GLFW | 3.4.0 | NuGet パッケージ（`packages.config` で管理） |
 
-構成は `Debug`・`Release` × `x64`・`Win32` の 4 通り。
+構成は `Debug`・`Release` × `x64` の 2 通り。32 bit（`Win32`）は用意していない。
+Vulkan SDK の 32 bit ライブラリが導入されておらず、対象環境も 64 bit だけのため。
 
 ## 環境構築手順
 
@@ -63,7 +64,7 @@ GLFW と違い Vulkan SDK は NuGet ではないので、`cpp.vcxproj` に参照
 ```xml
 <ItemDefinitionGroup>
   <ClCompile>
-    <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    <AdditionalIncludeDirectories>$(ProjectDir)src;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
   </ClCompile>
   <Link>
     <AdditionalDependencies>$(VULKAN_SDK)\Lib\vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -89,22 +90,66 @@ Visual Studio で `cpp.slnx` を開いてビルドするか、`cpp/` で次を�
 ./x64/Debug/cpp.exe
 ```
 
-環境が正しければ、コンソールに拡張の数が出てウィンドウが開く。
+環境が正しければ、コンソールに次の 2 行が出てウィンドウが開く。
 
 ```
-Vulkan instance extensions: 20
+Vulkan インスタンスを生成しました.
+バリデーション: 有効
+```
+
+Debug ビルドではバリデーションレイヤーが有効になり、Vulkan の使い方に誤りがあると
+標準エラーへ `[Vulkan] ...` の形で報告される。
+
+## ファイル構成
+
+ソースはすべて `src/` 以下に置き、**役割の層ごとにフォルダーを分ける**。
+
+```
+src/
+├── main.cpp              エントリーポイント。文字コード設定と例外の受け止めだけ
+├── Application.h/.cpp    資源をまとめて持ち、ウィンドウが閉じられるまで回し続ける
+├── Platform/             OS・ウィンドウの層（GLFW）
+│   ├── GlfwContext.h/.cpp   GLFW の初期化状態（glfwInit / glfwTerminate）
+│   └── GlfwWindow.h/.cpp    ウィンドウ（glfwCreateWindow / glfwDestroyWindow）
+└── Vulkan/               描画 API の層
+    ├── VulkanInstance.h/.cpp        VkInstance
+    └── VulkanDebugMessenger.h/.cpp  VkDebugUtilsMessengerEXT とバリデーションの判断
+```
+
+1 つのラッパークラスが 1 つの資源だけを持ち、破棄はデストラクターに任せる（Rule of 5）。
+利用側の `Application` は資源をメンバーとして並べるだけで済む（Rule of 0）。
+
+`Application` のメンバーは**宣言順に生成され、逆順に破棄される**。依存される側を前に、
+依存する側を後ろに並べておけば、破棄の順序は自動的に正しくなる。
+
+### インクルードは src からのパスで書く
+
+`cpp.vcxproj` の `AdditionalIncludeDirectories` に `$(ProjectDir)src` を入れてあるため、
+どのファイルからでも同じ書き方になる。**同じフォルダーのヘッダーでも相対では書かない。**
+
+```cpp
+// ✅ src からのパス. どこから include しても同じ表記になる.
+#include "Platform/GlfwContext.h"
+#include "Vulkan/VulkanInstance.h"
+
+// ❌ 相対パス. ファイルを移すたびに書き換えが要る.
+#include "GlfwContext.h"
+#include "../Vulkan/VulkanInstance.h"
 ```
 
 ## 開発時の注意
 
 ### ソースを追加したら 2 か所に登録する
 
-`cpp.vcxproj` にファイルを置くだけではビルド対象にならない。
+ファイルを置くだけではビルド対象にならない。**パスは `src\` から書く。**
 
-- `cpp.vcxproj` … `<ItemGroup>` に `<ClCompile Include="..." />` / `<ClInclude Include="..." />`
-- `cpp.vcxproj.filters` … 同じファイルを `ソース ファイル` / `ヘッダー ファイル` フィルターへ
+- `cpp.vcxproj` … `<ItemGroup>` に `<ClCompile Include="src\Vulkan\Foo.cpp" />` /
+  `<ClInclude Include="src\Vulkan\Foo.h" />`
+- `cpp.vcxproj.filters` … 同じファイルを、フォルダーに対応するフィルター
+  （`ソース ファイル\Vulkan` など）へ
 
-Visual Studio 上で追加すれば両方とも自動で更新される。
+Visual Studio 上で追加すれば両方とも自動で更新される。新しいフォルダーを作った場合は、
+`.filters` に `<Filter Include="ソース ファイル\<名前>">` を GUID 付きで足す。
 
 ### 日本語をコンソールに出す
 
@@ -137,5 +182,5 @@ Vulkan・GLFW のコードと衝突しないようにしている。
 有効にしてあるので、保存すれば自動で適用される。手動で掛けるなら次を実行する。
 
 ```bash
-"C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/Llvm/x64/bin/clang-format.exe" -i main.cpp
+"C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/Llvm/x64/bin/clang-format.exe" -i src/main.cpp
 ```
