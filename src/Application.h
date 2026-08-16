@@ -12,10 +12,10 @@
 
 #include <optional>
 
-#include "GlfwContext.h"
-#include "GlfwWindow.h"
-#include "VulkanDebugMessenger.h"
-#include "VulkanInstance.h"
+#include "Platform/GlfwContext.h"
+#include "Platform/GlfwWindow.h"
+#include "Vulkan/VulkanDebugMessenger.h"
+#include "Vulkan/VulkanInstance.h"
 
 /// <summary>
 /// 描画に必要な資源をまとめて持ち、ウィンドウが閉じられるまで動かし続ける.

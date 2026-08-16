@@ -8,7 +8,7 @@
 /// @author disaster
 //---------------------------------------
 
-#include "GlfwContext.h"
+#include "Platform/GlfwContext.h"
 
 #include <cstdint>
 #include <stdexcept>

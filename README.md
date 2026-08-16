@@ -101,31 +101,54 @@ Debug ビルドではバリデーションレイヤーが有効になり、Vulka
 
 ## ファイル構成
 
+ソースはすべて `src/` 以下に置き、**役割の層ごとにフォルダーを分ける**。
+
+```
+src/
+├── main.cpp              エントリーポイント。文字コード設定と例外の受け止めだけ
+├── Application.h/.cpp    資源をまとめて持ち、ウィンドウが閉じられるまで回し続ける
+├── Platform/             OS・ウィンドウの層（GLFW）
+│   ├── GlfwContext.h/.cpp   GLFW の初期化状態（glfwInit / glfwTerminate）
+│   └── GlfwWindow.h/.cpp    ウィンドウ（glfwCreateWindow / glfwDestroyWindow）
+└── Vulkan/               描画 API の層
+    ├── VulkanInstance.h/.cpp        VkInstance
+    └── VulkanDebugMessenger.h/.cpp  VkDebugUtilsMessengerEXT とバリデーションの判断
+```
+
 1 つのラッパークラスが 1 つの資源だけを持ち、破棄はデストラクターに任せる（Rule of 5）。
 利用側の `Application` は資源をメンバーとして並べるだけで済む（Rule of 0）。
 
-| ファイル | 受け持つもの |
-|------|------|
-| `main.cpp` | エントリーポイント。コンソールの文字コード設定と例外の受け止めだけ |
-| `Application.*` | 資源をまとめて持ち、ウィンドウが閉じられるまで回し続ける |
-| `GlfwContext.*` | GLFW の初期化状態（`glfwInit` / `glfwTerminate`） |
-| `GlfwWindow.*` | ウィンドウ（`glfwCreateWindow` / `glfwDestroyWindow`） |
-| `VulkanInstance.*` | `VkInstance` |
-| `VulkanDebugMessenger.*` | `VkDebugUtilsMessengerEXT` とバリデーションレイヤーの判断 |
-
 `Application` のメンバーは**宣言順に生成され、逆順に破棄される**。依存される側を前に、
 依存する側を後ろに並べておけば、破棄の順序は自動的に正しくなる。
+
+### インクルードは src からのパスで書く
+
+`cpp.vcxproj` の `AdditionalIncludeDirectories` に `$(ProjectDir)src` を入れてあるため、
+どのファイルからでも同じ書き方になる。**同じフォルダーのヘッダーでも相対では書かない。**
+
+```cpp
+// ✅ src からのパス. どこから include しても同じ表記になる.
+#include "Platform/GlfwContext.h"
+#include "Vulkan/VulkanInstance.h"
+
+// ❌ 相対パス. ファイルを移すたびに書き換えが要る.
+#include "GlfwContext.h"
+#include "../Vulkan/VulkanInstance.h"
+```
 
 ## 開発時の注意
 
 ### ソースを追加したら 2 か所に登録する
 
-`cpp.vcxproj` にファイルを置くだけではビルド対象にならない。
+ファイルを置くだけではビルド対象にならない。**パスは `src\` から書く。**
 
-- `cpp.vcxproj` … `<ItemGroup>` に `<ClCompile Include="..." />` / `<ClInclude Include="..." />`
-- `cpp.vcxproj.filters` … 同じファイルを `ソース ファイル` / `ヘッダー ファイル` フィルターへ
+- `cpp.vcxproj` … `<ItemGroup>` に `<ClCompile Include="src\Vulkan\Foo.cpp" />` /
+  `<ClInclude Include="src\Vulkan\Foo.h" />`
+- `cpp.vcxproj.filters` … 同じファイルを、フォルダーに対応するフィルター
+  （`ソース ファイル\Vulkan` など）へ
 
-Visual Studio 上で追加すれば両方とも自動で更新される。
+Visual Studio 上で追加すれば両方とも自動で更新される。新しいフォルダーを作った場合は、
+`.filters` に `<Filter Include="ソース ファイル\<名前>">` を GUID 付きで足す。
 
 ### 日本語をコンソールに出す
 

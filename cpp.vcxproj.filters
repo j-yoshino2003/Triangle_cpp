@@ -1,13 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ソース ファイル">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="ソース ファイル\Platform">
+      <UniqueIdentifier>{2b9c7a41-58d6-4f0e-9a3c-1d5e8f6b2c04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Vulkan">
+      <UniqueIdentifier>{7e14d0b3-3f8a-4b62-8c9d-0a1b2c3d4e5f}</UniqueIdentifier>
+    </Filter>
     <Filter Include="ヘッダー ファイル">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Platform">
+      <UniqueIdentifier>{5c8f1a92-6d4b-4e73-b1a8-9f2e3d4c5b60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Vulkan">
+      <UniqueIdentifier>{a3d7e058-4c19-4b8a-92f6-7e0d1c2b3a45}</UniqueIdentifier>
     </Filter>
     <Filter Include="リソース ファイル">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
@@ -15,40 +27,40 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp">
+    <ClCompile Include="src\Application.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="GlfwContext.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="GlfwWindow.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Platform\GlfwContext.cpp">
+      <Filter>ソース ファイル\Platform</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Platform\GlfwWindow.cpp">
+      <Filter>ソース ファイル\Platform</Filter>
     </ClCompile>
-    <ClCompile Include="VulkanDebugMessenger.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Vulkan\VulkanDebugMessenger.cpp">
+      <Filter>ソース ファイル\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="VulkanInstance.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="src\Vulkan\VulkanInstance.cpp">
+      <Filter>ソース ファイル\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h">
+    <ClInclude Include="src\Application.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="GlfwContext.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Platform\GlfwContext.h">
+      <Filter>ヘッダー ファイル\Platform</Filter>
     </ClInclude>
-    <ClInclude Include="GlfwWindow.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Platform\GlfwWindow.h">
+      <Filter>ヘッダー ファイル\Platform</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanDebugMessenger.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Vulkan\VulkanDebugMessenger.h">
+      <Filter>ヘッダー ファイル\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanInstance.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="src\Vulkan\VulkanInstance.h">
+      <Filter>ヘッダー ファイル\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -144,9 +144,10 @@
     </Manifest>
   </ItemDefinitionGroup>
   <!-- 全構成共通: Vulkan SDK の参照設定. VULKAN_SDK はインストーラーが設定する環境変数. -->
+  <!-- src をインクルードの起点にする. 各ファイルは "Platform/..." のようにサブフォルダーから書く. -->
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <!-- ソースと実行時の文字コードを UTF-8 に統一する. 未指定だと文字列リテラルが CP932 へ変換される. -->
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -155,19 +156,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="GlfwContext.cpp" />
-    <ClCompile Include="GlfwWindow.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="VulkanDebugMessenger.cpp" />
-    <ClCompile Include="VulkanInstance.cpp" />
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Platform\GlfwContext.cpp" />
+    <ClCompile Include="src\Platform\GlfwWindow.cpp" />
+    <ClCompile Include="src\Vulkan\VulkanDebugMessenger.cpp" />
+    <ClCompile Include="src\Vulkan\VulkanInstance.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="GlfwContext.h" />
-    <ClInclude Include="GlfwWindow.h" />
-    <ClInclude Include="VulkanDebugMessenger.h" />
-    <ClInclude Include="VulkanInstance.h" />
+    <ClInclude Include="src\Application.h" />
+    <ClInclude Include="src\Platform\GlfwContext.h" />
+    <ClInclude Include="src\Platform\GlfwWindow.h" />
+    <ClInclude Include="src\Vulkan\VulkanDebugMessenger.h" />
+    <ClInclude Include="src\Vulkan\VulkanInstance.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

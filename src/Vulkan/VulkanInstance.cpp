@@ -8,14 +8,14 @@
 /// @author disaster
 //---------------------------------------
 
-#include "VulkanInstance.h"
+#include "Vulkan/VulkanInstance.h"
 
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <utility>
 
-#include "VulkanDebugMessenger.h"
+#include "Vulkan/VulkanDebugMessenger.h"
 
 /// <summary>
 /// Vulkan インスタンスを生成する.

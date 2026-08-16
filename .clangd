@@ -13,6 +13,9 @@ CompileFlags:
     - --target=x86_64-pc-windows-msvc
     - -std=c++20
 
+    # インクルードの起点. 各ファイルは "Platform/..." のようにここからのパスで書く.
+    - -Isrc
+
     # GLFW の NuGet パッケージが定義するマクロ（glfw.targets 参照）.
     - -DHAS_GLFW
 

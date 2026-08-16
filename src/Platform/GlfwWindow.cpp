@@ -8,7 +8,7 @@
 /// @author disaster
 //---------------------------------------
 
-#include "GlfwWindow.h"
+#include "Platform/GlfwWindow.h"
 
 #include <stdexcept>
 #include <utility>
