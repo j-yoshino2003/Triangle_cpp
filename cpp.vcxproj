@@ -156,6 +156,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="VulkanInstance.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="VulkanInstance.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

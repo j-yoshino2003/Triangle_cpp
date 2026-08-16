@@ -11,6 +11,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
+#include <vector>
 
 // NOTE:
 // windows.h は min / max マクロなどで衝突を起こしやすいため、取り込む範囲を絞ってから読み込む.
@@ -23,6 +25,8 @@
 // glfwCreateWindowSurface などの Vulkan 連携 API が使えるようになる.
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+
+#include "VulkanInstance.h"
 
 namespace
 {
@@ -37,31 +41,99 @@ constexpr int WINDOW_HEIGHT = 600;
 constexpr const char* WINDOW_TITLE = "Triangle (C++)";
 
 /// <summary>
-/// Vulkan のインスタンス拡張の数を表示して、SDK とローダーが動くことを確認する.
+/// GLFW が Vulkan の利用に必要とする拡張の一覧を取得する.
 /// </summary>
-/// <returns>取得に成功したら true.</returns>
-bool ReportInstanceExtensions()
+/// <returns>拡張名の一覧.</returns>
+/// <exception cref="std::runtime_error">取得に失敗した場合.</exception>
+std::vector<const char*> GetRequiredExtensions()
 {
     uint32_t extensionCount{};
+    const char** const extensionNames = glfwGetRequiredInstanceExtensions(&extensionCount);
 
-    if (vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr) != VK_SUCCESS)
+    if (extensionNames == nullptr)
     {
-        std::cerr << "Vulkan のインスタンス拡張を取得できませんでした." << std::endl;
-
-        return false;
+        throw std::runtime_error("GLFW が要求する Vulkan 拡張を取得できませんでした.");
     }
 
-    std::cout << "Vulkan インスタンス拡張の数: " << extensionCount << std::endl;
+    return std::vector<const char*>(extensionNames, extensionNames + extensionCount);
+}
 
-    return true;
+// NOTE:
+// windows.h が CreateWindow をマクロとして定義しているため、その名前は使えない.
+/// <summary>
+/// Vulkan で描画するためのウィンドウを生成する.
+/// </summary>
+/// <returns>生成したウィンドウ.</returns>
+/// <exception cref="std::runtime_error">生成に失敗した場合.</exception>
+GLFWwindow* CreateAppWindow()
+{
+    // GLFW は既定で OpenGL のコンテキストを作るため、Vulkan で使うときは明示的に無効化する.
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+    GLFWwindow* const window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
+
+    if (window == nullptr)
+    {
+        throw std::runtime_error("ウィンドウの生成に失敗しました.");
+    }
+
+    return window;
+}
+
+/// <summary>
+/// ウィンドウを表示し、閉じられるまでイベントを処理し続ける.
+/// </summary>
+/// <exception cref="std::runtime_error">初期化に失敗した場合.</exception>
+void Run()
+{
+    if (glfwInit() != GLFW_TRUE)
+    {
+        throw std::runtime_error("GLFW の初期化に失敗しました.");
+    }
+
+    if (glfwVulkanSupported() != GLFW_TRUE)
+    {
+        glfwTerminate();
+
+        throw std::runtime_error("この環境では Vulkan が利用できません.");
+    }
+
+    GLFWwindow* window{};
+
+    try
+    {
+        window = CreateAppWindow();
+
+        const VulkanInstance instance{GetRequiredExtensions()};
+
+        std::cout << "Vulkan インスタンスを生成しました." << std::endl;
+
+        while (glfwWindowShouldClose(window) == GLFW_FALSE)
+        {
+            glfwPollEvents();
+        }
+    }
+    catch (...)
+    {
+        // NOTE:
+        // GLFW は C の API で RAII が効かないため、例外で抜けるときも確実に後始末する.
+        if (window != nullptr)
+        {
+            glfwDestroyWindow(window);
+        }
+
+        glfwTerminate();
+
+        throw;
+    }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 } // namespace
 
-// TODO:
-// ここは環境確認用の暫定コード.
-// 三角形の描画に着手する際、GLFW と Vulkan のハンドルは破棄処理を持つ
-// ラッパークラスへ隔離し、呼び出し側を Rule of 0 に保つ.
 int main()
 {
     // NOTE:
@@ -70,49 +142,16 @@ int main()
     // これを忘れると日本語が文字化けする.
     SetConsoleOutputCP(CP_UTF8);
 
-    if (glfwInit() != GLFW_TRUE)
+    try
     {
-        std::cerr << "GLFW の初期化に失敗しました." << std::endl;
+        Run();
+    }
+    catch (const std::exception& error)
+    {
+        std::cerr << "エラー: " << error.what() << std::endl;
 
         return EXIT_FAILURE;
     }
-
-    if (glfwVulkanSupported() != GLFW_TRUE)
-    {
-        std::cerr << "この環境では Vulkan が利用できません." << std::endl;
-        glfwTerminate();
-
-        return EXIT_FAILURE;
-    }
-
-    if (!ReportInstanceExtensions())
-    {
-        glfwTerminate();
-
-        return EXIT_FAILURE;
-    }
-
-    // GLFW は既定で OpenGL のコンテキストを作るため、Vulkan で使うときは明示的に無効化する.
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-
-    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
-
-    if (window == nullptr)
-    {
-        std::cerr << "ウィンドウの生成に失敗しました." << std::endl;
-        glfwTerminate();
-
-        return EXIT_FAILURE;
-    }
-
-    while (glfwWindowShouldClose(window) == GLFW_FALSE)
-    {
-        glfwPollEvents();
-    }
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
 
     return EXIT_SUCCESS;
 }
