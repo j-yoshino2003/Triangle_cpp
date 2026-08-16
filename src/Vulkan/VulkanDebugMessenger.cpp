@@ -15,8 +15,11 @@
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
+
+#include <vulkan/vk_enum_string_helper.h>
 
 namespace
 {
@@ -138,9 +141,13 @@ VulkanDebugMessenger::VulkanDebugMessenger(const VkInstance _Instance) : m_Insta
 
     const VkDebugUtilsMessengerCreateInfoEXT createInfo{MakeCreateInfo()};
 
-    if (createFunction(m_Instance, &createInfo, nullptr, &m_Messenger) != VK_SUCCESS)
+    // NOTE:
+    // 結果コードを握りつぶすと失敗の理由が分からなくなるため、メッセージへ残す.
+    const VkResult result = createFunction(m_Instance, &createInfo, nullptr, &m_Messenger);
+
+    if (result != VK_SUCCESS)
     {
-        throw std::runtime_error("デバッグメッセンジャーの生成に失敗しました.");
+        throw std::runtime_error(std::string{"デバッグメッセンジャーの生成に失敗しました: "} + string_VkResult(result));
     }
 }
 
@@ -157,7 +164,7 @@ VulkanDebugMessenger::~VulkanDebugMessenger()
 /// </summary>
 /// <param name="other">移動元. 呼び出し後は空になる.</param>
 VulkanDebugMessenger::VulkanDebugMessenger(VulkanDebugMessenger&& other) noexcept
-    : m_Instance{std::exchange(other.m_Instance, VK_NULL_HANDLE)},
+    : m_Instance{std::exchange(other.m_Instance, VkInstance{})},
       m_Messenger{std::exchange(other.m_Messenger, VK_NULL_HANDLE)}
 {
 }
@@ -173,7 +180,7 @@ VulkanDebugMessenger& VulkanDebugMessenger::operator=(VulkanDebugMessenger&& oth
     {
         Destroy();
 
-        m_Instance = std::exchange(other.m_Instance, VK_NULL_HANDLE);
+        m_Instance = std::exchange(other.m_Instance, VkInstance{});
         m_Messenger = std::exchange(other.m_Messenger, VK_NULL_HANDLE);
     }
 

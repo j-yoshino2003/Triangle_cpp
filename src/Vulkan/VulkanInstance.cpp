@@ -13,7 +13,10 @@
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 #include <utility>
+
+#include <vulkan/vk_enum_string_helper.h>
 
 #include "Vulkan/VulkanDebugMessenger.h"
 
@@ -72,9 +75,14 @@ VulkanInstance::VulkanInstance(const std::vector<const char*>& requiredExtension
         createInfo.pNext = &debugCreateInfo;
     }
 
-    if (vkCreateInstance(&createInfo, nullptr, &m_Instance) != VK_SUCCESS)
+    // NOTE:
+    // 結果コードをそのまま握りつぶすと、レイヤー不足・拡張名の誤り・ドライバー非互換のどれかが
+    // 分からなくなる. 失敗の切り分けに要るのでメッセージへ残す.
+    const VkResult result = vkCreateInstance(&createInfo, nullptr, &m_Instance);
+
+    if (result != VK_SUCCESS)
     {
-        throw std::runtime_error("Vulkan インスタンスの生成に失敗しました.");
+        throw std::runtime_error(std::string{"Vulkan インスタンスの生成に失敗しました: "} + string_VkResult(result));
     }
 }
 
@@ -91,7 +99,7 @@ VulkanInstance::~VulkanInstance()
 /// </summary>
 /// <param name="other">移動元. 呼び出し後は空になる.</param>
 VulkanInstance::VulkanInstance(VulkanInstance&& other) noexcept
-    : m_Instance{std::exchange(other.m_Instance, VK_NULL_HANDLE)},
+    : m_Instance{std::exchange(other.m_Instance, VkInstance{})},
       m_IsValidationEnabled{std::exchange(other.m_IsValidationEnabled, false)}
 {
 }
@@ -107,7 +115,7 @@ VulkanInstance& VulkanInstance::operator=(VulkanInstance&& other) noexcept
     {
         Destroy();
 
-        m_Instance = std::exchange(other.m_Instance, VK_NULL_HANDLE);
+        m_Instance = std::exchange(other.m_Instance, VkInstance{});
         m_IsValidationEnabled = std::exchange(other.m_IsValidationEnabled, false);
     }
 
