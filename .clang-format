@@ -8,7 +8,7 @@ IndentWidth: 4
 TabWidth: 4
 UseTab: Never
 AccessModifierOffset: -4
-NamespaceIndentation: None
+NamespaceIndentation: All
 
 # 1 行は 120 文字まで.
 ColumnLimit: 120
@@ -17,7 +17,7 @@ ColumnLimit: 120
 BreakBeforeBraces: Allman
 
 # 短い関数・条件文でも 1 行にまとめない（規約でかっこを必須としているため）.
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AllowShortBlocksOnASingleLine: Never

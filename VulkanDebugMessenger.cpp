@@ -20,35 +20,34 @@
 
 namespace
 {
-
-// NOTE:
-// Vulkan には関数ポインターとして渡すため、メンバー関数にはできない.
-// ヘッダーへ出さずに済むよう、この翻訳単位に閉じた自由関数として置く.
-/// <summary>
-/// バリデーションレイヤーからのメッセージを受け取って標準エラーへ出力する.
-/// </summary>
-/// <param name="_Severity">メッセージの深刻度.</param>
-/// <param name="_Type">メッセージの種類.</param>
-/// <param name="_CallbackData">メッセージ本体.</param>
-/// <param name="_UserData">利用者が登録した任意のデータ. 今は使わない.</param>
-/// <returns>VK_TRUE = 呼び出し元の Vulkan 関数を中断する、VK_FALSE = 続行する.</returns>
-VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT _Severity,
-                                             const VkDebugUtilsMessageTypeFlagsEXT _Type,
-                                             const VkDebugUtilsMessengerCallbackDataEXT* const _CallbackData,
-                                             void* const _UserData)
-{
-    // 使わない引数を明示的に無視する.
-    static_cast<void>(_Type);
-    static_cast<void>(_UserData);
-
-    if (_Severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+    /// <summary>
+    /// バリデーションレイヤーからのメッセージを受け取って標準エラーへ出力する.
+    ///
+    /// NOTE:
+    /// Vulkan には関数ポインターとして渡すため、メンバー関数にはできない.
+    /// ヘッダーへ出さずに済むよう、この翻訳単位に閉じた自由関数として置く.
+    /// </summary>
+    /// <param name="_Severity">メッセージの深刻度.</param>
+    /// <param name="_Type">メッセージの種類.</param>
+    /// <param name="_CallbackData">メッセージ本体.</param>
+    /// <param name="_UserData">利用者が登録した任意のデータ. 今は使わない.</param>
+    /// <returns>VK_TRUE = 呼び出し元の Vulkan 関数を中断する、VK_FALSE = 続行する.</returns>
+    VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(const VkDebugUtilsMessageSeverityFlagBitsEXT _Severity,
+                                                 const VkDebugUtilsMessageTypeFlagsEXT _Type,
+                                                 const VkDebugUtilsMessengerCallbackDataEXT* const _CallbackData,
+                                                 void* const _UserData)
     {
-        std::cerr << "[Vulkan] " << _CallbackData->pMessage << std::endl;
+        // 使わない引数を明示的に無視する.
+        static_cast<void>(_Type);
+        static_cast<void>(_UserData);
+
+        if (_Severity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+        {
+            std::cerr << "[Vulkan] " << _CallbackData->pMessage << std::endl;
+        }
+
+        return VK_FALSE;
     }
-
-    return VK_FALSE;
-}
-
 } // namespace
 
 /// <summary>
