@@ -1,0 +1,23 @@
+# clangd（Zed の C++ 補完・定義ジャンプ）に渡すコンパイルオプション.
+#
+# 本来 clangd は CMake などが出力する compile_commands.json を読むが、このプロジェクトは
+# MSBuild (.vcxproj) でビルドしており、それを出力できない. 代わりにこのファイルで
+# インクルードパスと言語標準を直接教える.
+#
+# NOTE:
+# ここはあくまで「エディタの解析用」の設定で、実際のビルドには一切影響しない.
+# .vcxproj 側にインクルードパスやマクロを追加したら、このファイルにも同じものを足すこと.
+CompileFlags:
+  Add:
+    # MSVC 互換で解析する. これにより標準ライブラリと Windows SDK のヘッダーを見つける.
+    - --target=x86_64-pc-windows-msvc
+    - -std=c++20
+
+    # GLFW の NuGet パッケージが定義するマクロ（glfw.targets 参照）.
+    - -DHAS_GLFW
+
+    # GLFW のヘッダー. このファイルからの相対パス.
+    - -Ipackages/glfw.3.4.0/build/native/include
+
+    # Vulkan SDK のヘッダー. 環境変数を展開できないため絶対パスで書く.
+    - -IC:/VulkanSDK/1.4.357.0/Include

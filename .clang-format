@@ -1,0 +1,33 @@
+---
+# .claude/rules/ のコーディング規約を clang-format で機械的に適用するための設定.
+Language: Cpp
+BasedOnStyle: LLVM
+
+# インデントは 4 スペース. タブは使わない.
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+AccessModifierOffset: -4
+NamespaceIndentation: None
+
+# 1 行は 120 文字まで.
+ColumnLimit: 120
+
+# 波かっこは必ず改行してから開く.
+BreakBeforeBraces: Allman
+
+# 短い関数・条件文でも 1 行にまとめない（規約でかっこを必須としているため）.
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+
+# ポインター・参照は型側に寄せる（GLFWwindow* window）.
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# NOTE:
+# インクルード順は「浅いパス優先 → 同じ深さならアルファベット順」という独自規約のため、
+# clang-format の並べ替えには任せず手で並べる.
+SortIncludes: false
