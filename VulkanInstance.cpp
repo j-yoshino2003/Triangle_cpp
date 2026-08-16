@@ -17,14 +17,6 @@
 
 #include "VulkanDebugMessenger.h"
 
-namespace
-{
-
-/// アプリケーション名.
-constexpr const char* APPLICATION_NAME = "Triangle (C++)";
-
-} // namespace
-
 /// <summary>
 /// Vulkan インスタンスを生成する.
 /// バリデーションレイヤーが使える状況なら、あわせて有効にする.

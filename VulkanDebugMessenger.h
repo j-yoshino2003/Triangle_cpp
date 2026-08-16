@@ -53,6 +53,9 @@ private:
     /// 保持しているハンドルを破棄する.
     void Destroy() noexcept;
 
+    /// 有効にするバリデーションレイヤーの名前.
+    static constexpr const char* VALIDATION_LAYER_NAME = "VK_LAYER_KHRONOS_validation";
+
     /// 生成元のインスタンス. 破棄に必要なだけで、所有はしない.
     VkInstance m_Instance{};
 

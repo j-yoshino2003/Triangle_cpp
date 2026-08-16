@@ -49,6 +49,9 @@ private:
     /// 保持しているハンドルを破棄する.
     void Destroy() noexcept;
 
+    /// アプリケーション名.
+    static constexpr const char* APPLICATION_NAME = "Triangle (C++)";
+
     /// Vulkan インスタンス.
     VkInstance m_Instance{};
 

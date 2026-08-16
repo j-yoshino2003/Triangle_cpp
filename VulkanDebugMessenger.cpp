@@ -21,9 +21,6 @@
 namespace
 {
 
-/// 有効にするバリデーションレイヤーの名前.
-constexpr const char* VALIDATION_LAYER_NAME = "VK_LAYER_KHRONOS_validation";
-
 // NOTE:
 // Vulkan には関数ポインターとして渡すため、メンバー関数にはできない.
 // ヘッダーへ出さずに済むよう、この翻訳単位に閉じた自由関数として置く.
