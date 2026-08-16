@@ -13,6 +13,25 @@
 #include <vulkan/vulkan.h>
 
 /// <summary>
+/// バリデーションレイヤーを使えるかどうかと、使えない場合の理由.
+/// 「レイヤーが無い」と「問い合わせ自体が失敗した」は原因が別物なので区別する.
+/// </summary>
+enum class ValidationLayerAvailability
+{
+    /// 利用できる.
+    AVAILABLE,
+
+    /// 問い合わせは成功したが、レイヤーがこの環境に無い.
+    NOT_FOUND,
+
+    /// レイヤーの列挙 API 自体が失敗した. 有無は判定できていない.
+    QUERY_FAILED,
+
+    /// 番兵.
+    MAX
+};
+
+/// <summary>
 /// VkDebugUtilsMessengerEXT の生成・破棄を受け持つ.
 /// バリデーションレイヤーに関する判断もこのクラスへ集約する.
 /// </summary>
@@ -22,8 +41,8 @@ public:
     /// バリデーションによる検査を行いたい状況かどうかを返す.
     static bool IsRequested();
 
-    /// バリデーションレイヤーがこの環境に存在するかどうかを返す.
-    static bool IsAvailable();
+    /// バリデーションレイヤーを使えるかどうかを、使えない場合の理由つきで返す.
+    static ValidationLayerAvailability GetAvailability();
 
     /// 有効にするバリデーションレイヤーの名前を返す.
     static const char* GetLayerName();

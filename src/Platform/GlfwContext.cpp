@@ -11,10 +11,28 @@
 #include "Platform/GlfwContext.h"
 
 #include <cstdint>
+#include <iostream>
 #include <stdexcept>
 #include <utility>
 
 #include <GLFW/glfw3.h>
+
+namespace
+{
+    /// <summary>
+    /// GLFW が報告した失敗の内容を標準エラーへ出力する.
+    ///
+    /// NOTE:
+    /// GLFW には関数ポインターとして渡すため、メンバー関数にはできない.
+    /// ヘッダーへ出さずに済むよう、この翻訳単位に閉じた自由関数として置く.
+    /// </summary>
+    /// <param name="_ErrorCode">GLFW のエラーコード.</param>
+    /// <param name="_Description">人が読める失敗の説明.</param>
+    void ErrorCallback(const int _ErrorCode, const char* const _Description)
+    {
+        std::cerr << "[GLFW] " << _ErrorCode << ": " << _Description << std::endl;
+    }
+} // namespace
 
 /// <summary>
 /// GLFW を初期化し、Vulkan が使える環境かどうかもあわせて確かめる.
@@ -22,6 +40,12 @@
 /// <exception cref="std::runtime_error">初期化に失敗した場合、または Vulkan を利用できない場合.</exception>
 GlfwContext::GlfwContext()
 {
+    // NOTE:
+    // GLFW の API は成否しか返さず、具体的な理由はコールバック経由でしか受け取れない.
+    // 登録しないと「初期化に失敗しました」だけが残り、原因の切り分けができない.
+    // glfwSetErrorCallback は初期化前に呼べる数少ない関数の 1 つ.
+    glfwSetErrorCallback(ErrorCallback);
+
     if (glfwInit() != GLFW_TRUE)
     {
         throw std::runtime_error("GLFW の初期化に失敗しました.");

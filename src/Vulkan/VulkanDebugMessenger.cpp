@@ -69,27 +69,36 @@ bool VulkanDebugMessenger::IsRequested()
 }
 
 /// <summary>
-/// バリデーションレイヤーがこの環境に存在するかどうかを返す.
+/// バリデーションレイヤーを使えるかどうかを、使えない場合の理由つきで返す.
+/// 列挙 API の失敗はここでしか結果コードを持てないため、詳細もこの場で出力する.
 /// </summary>
-/// <returns>true = この環境に存在する、false = 存在しない.</returns>
-bool VulkanDebugMessenger::IsAvailable()
+/// <returns>利用可否と、利用できない場合の理由.</returns>
+ValidationLayerAvailability VulkanDebugMessenger::GetAvailability()
 {
     uint32_t layerCount{};
+    const VkResult countResult = vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
-    if (vkEnumerateInstanceLayerProperties(&layerCount, nullptr) != VK_SUCCESS)
+    if (countResult != VK_SUCCESS)
     {
-        return false;
+        std::cerr << "[Vulkan] レイヤー数の取得に失敗しました: " << string_VkResult(countResult) << std::endl;
+
+        return ValidationLayerAvailability::QUERY_FAILED;
     }
 
     std::vector<VkLayerProperties> layers(layerCount);
+    const VkResult listResult = vkEnumerateInstanceLayerProperties(&layerCount, layers.data());
 
-    if (vkEnumerateInstanceLayerProperties(&layerCount, layers.data()) != VK_SUCCESS)
+    if (listResult != VK_SUCCESS)
     {
-        return false;
+        std::cerr << "[Vulkan] レイヤー一覧の取得に失敗しました: " << string_VkResult(listResult) << std::endl;
+
+        return ValidationLayerAvailability::QUERY_FAILED;
     }
 
-    return std::any_of(layers.begin(), layers.end(), [](const VkLayerProperties& layer)
-                       { return std::strcmp(layer.layerName, VALIDATION_LAYER_NAME) == 0; });
+    const bool isFound = std::any_of(layers.begin(), layers.end(), [](const VkLayerProperties& layer)
+                                     { return std::strcmp(layer.layerName, VALIDATION_LAYER_NAME) == 0; });
+
+    return isFound ? ValidationLayerAvailability::AVAILABLE : ValidationLayerAvailability::NOT_FOUND;
 }
 
 /// <summary>
@@ -201,10 +210,19 @@ void VulkanDebugMessenger::Destroy() noexcept
     const auto destroyFunction = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
         vkGetInstanceProcAddr(m_Instance, "vkDestroyDebugUtilsMessengerEXT"));
 
-    if (destroyFunction != nullptr)
+    if (destroyFunction == nullptr)
     {
-        destroyFunction(m_Instance, m_Messenger, nullptr);
+        // NOTE:
+        // noexcept なので例外は投げられない. ここで黙って抜けるとハンドルが残ったまま
+        // 破棄済みとして扱われ、痕跡が何も残らないため警告だけ出す.
+        // ハンドルも消さずに残し、破棄できていない事実を状態にも反映する.
+        std::cerr << "[Vulkan] vkDestroyDebugUtilsMessengerEXT を取得できず、メッセンジャーを破棄できません."
+                  << std::endl;
+
+        return;
     }
+
+    destroyFunction(m_Instance, m_Messenger, nullptr);
 
     m_Messenger = VK_NULL_HANDLE;
 }
