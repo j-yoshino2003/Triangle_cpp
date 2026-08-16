@@ -210,10 +210,19 @@ void VulkanDebugMessenger::Destroy() noexcept
     const auto destroyFunction = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
         vkGetInstanceProcAddr(m_Instance, "vkDestroyDebugUtilsMessengerEXT"));
 
-    if (destroyFunction != nullptr)
+    if (destroyFunction == nullptr)
     {
-        destroyFunction(m_Instance, m_Messenger, nullptr);
+        // NOTE:
+        // noexcept なので例外は投げられない. ここで黙って抜けるとハンドルが残ったまま
+        // 破棄済みとして扱われ、痕跡が何も残らないため警告だけ出す.
+        // ハンドルも消さずに残し、破棄できていない事実を状態にも反映する.
+        std::cerr << "[Vulkan] vkDestroyDebugUtilsMessengerEXT を取得できず、メッセンジャーを破棄できません."
+                  << std::endl;
+
+        return;
     }
+
+    destroyFunction(m_Instance, m_Messenger, nullptr);
 
     m_Messenger = VK_NULL_HANDLE;
 }
