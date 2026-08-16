@@ -49,6 +49,7 @@ private:
     /// 保持しているハンドルを破棄する.
     void Destroy() noexcept;
 
+private:
     /// アプリケーション名.
     static constexpr const char* APPLICATION_NAME = "Triangle (C++)";
 

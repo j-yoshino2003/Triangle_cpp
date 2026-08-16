@@ -53,6 +53,7 @@ private:
     /// 保持しているハンドルを破棄する.
     void Destroy() noexcept;
 
+private:
     /// 有効にするバリデーションレイヤーの名前.
     static constexpr const char* VALIDATION_LAYER_NAME = "VK_LAYER_KHRONOS_validation";
 
