@@ -21,39 +21,37 @@
 class VulkanInstance
 {
 public:
-    /// <summary>
     /// Vulkan インスタンスを生成する.
-    /// バリデーションレイヤーが使える状況なら、あわせて有効にする.
-    /// </summary>
-    /// <param name="requiredExtensions">ウィンドウ側が要求する拡張の一覧.</param>
-    /// <exception cref="std::runtime_error">生成に失敗した場合.</exception>
     explicit VulkanInstance(const std::vector<const char*>& requiredExtensions);
 
+    /// 保持しているインスタンスを破棄する.
     ~VulkanInstance();
 
-    // コピーすると同じハンドルを二重に破棄してしまうため禁止する.
+    /// コピー構築. 同じハンドルを二重に破棄しないよう禁止する.
     VulkanInstance(const VulkanInstance&) = delete;
+
+    /// コピー代入. 同じハンドルを二重に破棄しないよう禁止する.
     VulkanInstance& operator=(const VulkanInstance&) = delete;
 
+    /// ムーブ構築. 所有権を移す.
     VulkanInstance(VulkanInstance&& other) noexcept;
+
+    /// ムーブ代入. 所有権を移す.
     VulkanInstance& operator=(VulkanInstance&& other) noexcept;
 
-    /// <summary>
     /// 生の VkInstance を取得する.
-    /// </summary>
-    /// <returns>Vulkan インスタンス.</returns>
     VkInstance Get() const;
 
-    /// <summary>
     /// バリデーションレイヤーを有効にして生成できたかどうかを返す.
-    /// </summary>
-    /// <returns>有効なら true.</returns>
     bool IsValidationEnabled() const;
 
 private:
     /// 保持しているハンドルを破棄する.
     void Destroy() noexcept;
 
+    /// Vulkan インスタンス.
     VkInstance m_Instance{};
+
+    /// バリデーションレイヤーを有効にできたか.
     bool m_IsValidationEnabled{};
 };

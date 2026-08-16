@@ -19,54 +19,43 @@
 class VulkanDebugMessenger
 {
 public:
-    /// <summary>
     /// バリデーションによる検査を行いたい状況かどうかを返す.
-    /// </summary>
-    /// <returns>デバッグビルドなら true.</returns>
     static bool IsRequested();
 
-    /// <summary>
     /// バリデーションレイヤーがこの環境に存在するかどうかを返す.
-    /// </summary>
-    /// <returns>存在すれば true.</returns>
     static bool IsAvailable();
 
-    /// <summary>
     /// 有効にするバリデーションレイヤーの名前を返す.
-    /// </summary>
-    /// <returns>レイヤー名.</returns>
     static const char* GetLayerName();
 
-    /// <summary>
     /// メッセンジャーの生成情報を組み立てる.
-    /// VkInstanceCreateInfo の pNext へ繋ぐ用途にも使う.
-    /// </summary>
-    /// <returns>生成情報.</returns>
     static VkDebugUtilsMessengerCreateInfoEXT MakeCreateInfo();
 
-    /// <summary>
     /// メッセンジャーを生成する.
-    /// </summary>
-    /// <param name="_Instance">生成元のインスタンス. 所有はしない.</param>
-    /// <exception cref="std::runtime_error">生成に失敗した場合.</exception>
     explicit VulkanDebugMessenger(const VkInstance _Instance);
 
+    /// 保持しているメッセンジャーを破棄する.
     ~VulkanDebugMessenger();
 
-    // コピーすると同じハンドルを二重に破棄してしまうため禁止する.
+    /// コピー構築. 同じハンドルを二重に破棄しないよう禁止する.
     VulkanDebugMessenger(const VulkanDebugMessenger&) = delete;
+
+    /// コピー代入. 同じハンドルを二重に破棄しないよう禁止する.
     VulkanDebugMessenger& operator=(const VulkanDebugMessenger&) = delete;
 
+    /// ムーブ構築. 所有権を移す.
     VulkanDebugMessenger(VulkanDebugMessenger&& other) noexcept;
+
+    /// ムーブ代入. 所有権を移す.
     VulkanDebugMessenger& operator=(VulkanDebugMessenger&& other) noexcept;
 
 private:
     /// 保持しているハンドルを破棄する.
     void Destroy() noexcept;
 
-    // NOTE:
-    // 破棄には生成元のインスタンスが要るため保持する. 所有はしないので破棄もしない.
+    /// 生成元のインスタンス. 破棄に必要なだけで、所有はしない.
     VkInstance m_Instance{};
 
+    /// デバッグメッセンジャー.
     VkDebugUtilsMessengerEXT m_Messenger{};
 };

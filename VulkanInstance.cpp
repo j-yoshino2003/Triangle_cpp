@@ -25,6 +25,12 @@ constexpr const char* APPLICATION_NAME = "Triangle (C++)";
 
 } // namespace
 
+/// <summary>
+/// Vulkan インスタンスを生成する.
+/// バリデーションレイヤーが使える状況なら、あわせて有効にする.
+/// </summary>
+/// <param name="requiredExtensions">ウィンドウ側が要求する拡張の一覧.</param>
+/// <exception cref="std::runtime_error">生成に失敗した場合.</exception>
 VulkanInstance::VulkanInstance(const std::vector<const char*>& requiredExtensions)
 {
     const bool isValidationRequested = VulkanDebugMessenger::IsRequested();
@@ -80,17 +86,29 @@ VulkanInstance::VulkanInstance(const std::vector<const char*>& requiredExtension
     }
 }
 
+/// <summary>
+/// 保持しているインスタンスを破棄する.
+/// </summary>
 VulkanInstance::~VulkanInstance()
 {
     Destroy();
 }
 
+/// <summary>
+/// 所有権を移してムーブ構築する.
+/// </summary>
+/// <param name="other">移動元. 呼び出し後は空になる.</param>
 VulkanInstance::VulkanInstance(VulkanInstance&& other) noexcept
     : m_Instance{std::exchange(other.m_Instance, VK_NULL_HANDLE)},
       m_IsValidationEnabled{std::exchange(other.m_IsValidationEnabled, false)}
 {
 }
 
+/// <summary>
+/// 自分の持つインスタンスを破棄してから、所有権を移す.
+/// </summary>
+/// <param name="other">移動元. 呼び出し後は空になる.</param>
+/// <returns>自分自身.</returns>
 VulkanInstance& VulkanInstance::operator=(VulkanInstance&& other) noexcept
 {
     if (this != &other)
@@ -104,16 +122,28 @@ VulkanInstance& VulkanInstance::operator=(VulkanInstance&& other) noexcept
     return *this;
 }
 
+/// <summary>
+/// 生の VkInstance を取得する.
+/// </summary>
+/// <returns>Vulkan インスタンス.</returns>
 VkInstance VulkanInstance::Get() const
 {
     return m_Instance;
 }
 
+/// <summary>
+/// バリデーションレイヤーを有効にして生成できたかどうかを返す.
+/// </summary>
+/// <returns>有効なら true.</returns>
 bool VulkanInstance::IsValidationEnabled() const
 {
     return m_IsValidationEnabled;
 }
 
+/// <summary>
+/// 保持しているハンドルを破棄する.
+/// 破棄済み・未生成のいずれでも安全に呼べる.
+/// </summary>
 void VulkanInstance::Destroy() noexcept
 {
     if (m_Instance != VK_NULL_HANDLE)

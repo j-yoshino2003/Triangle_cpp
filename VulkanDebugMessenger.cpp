@@ -54,6 +54,10 @@ VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(const VkDebugUtilsMessageSeverityFl
 
 } // namespace
 
+/// <summary>
+/// バリデーションによる検査を行いたい状況かどうかを返す.
+/// </summary>
+/// <returns>デバッグビルドなら true.</returns>
 bool VulkanDebugMessenger::IsRequested()
 {
     // NOTE:
@@ -65,6 +69,10 @@ bool VulkanDebugMessenger::IsRequested()
 #endif
 }
 
+/// <summary>
+/// バリデーションレイヤーがこの環境に存在するかどうかを返す.
+/// </summary>
+/// <returns>存在すれば true.</returns>
 bool VulkanDebugMessenger::IsAvailable()
 {
     uint32_t layerCount{};
@@ -85,11 +93,20 @@ bool VulkanDebugMessenger::IsAvailable()
                        { return std::strcmp(layer.layerName, VALIDATION_LAYER_NAME) == 0; });
 }
 
+/// <summary>
+/// 有効にするバリデーションレイヤーの名前を返す.
+/// </summary>
+/// <returns>レイヤー名.</returns>
 const char* VulkanDebugMessenger::GetLayerName()
 {
     return VALIDATION_LAYER_NAME;
 }
 
+/// <summary>
+/// メッセンジャーの生成情報を組み立てる.
+/// VkInstanceCreateInfo の pNext へ繋ぐ用途にも使う.
+/// </summary>
+/// <returns>生成情報.</returns>
 VkDebugUtilsMessengerCreateInfoEXT VulkanDebugMessenger::MakeCreateInfo()
 {
     VkDebugUtilsMessengerCreateInfoEXT createInfo{};
@@ -105,6 +122,11 @@ VkDebugUtilsMessengerCreateInfoEXT VulkanDebugMessenger::MakeCreateInfo()
     return createInfo;
 }
 
+/// <summary>
+/// メッセンジャーを生成する.
+/// </summary>
+/// <param name="_Instance">生成元のインスタンス. 所有はしない.</param>
+/// <exception cref="std::runtime_error">生成に失敗した場合.</exception>
 VulkanDebugMessenger::VulkanDebugMessenger(const VkInstance _Instance) : m_Instance{_Instance}
 {
     // NOTE:
@@ -126,17 +148,29 @@ VulkanDebugMessenger::VulkanDebugMessenger(const VkInstance _Instance) : m_Insta
     }
 }
 
+/// <summary>
+/// 保持しているメッセンジャーを破棄する.
+/// </summary>
 VulkanDebugMessenger::~VulkanDebugMessenger()
 {
     Destroy();
 }
 
+/// <summary>
+/// 所有権を移してムーブ構築する.
+/// </summary>
+/// <param name="other">移動元. 呼び出し後は空になる.</param>
 VulkanDebugMessenger::VulkanDebugMessenger(VulkanDebugMessenger&& other) noexcept
     : m_Instance{std::exchange(other.m_Instance, VK_NULL_HANDLE)},
       m_Messenger{std::exchange(other.m_Messenger, VK_NULL_HANDLE)}
 {
 }
 
+/// <summary>
+/// 自分の持つメッセンジャーを破棄してから、所有権を移す.
+/// </summary>
+/// <param name="other">移動元. 呼び出し後は空になる.</param>
+/// <returns>自分自身.</returns>
 VulkanDebugMessenger& VulkanDebugMessenger::operator=(VulkanDebugMessenger&& other) noexcept
 {
     if (this != &other)
@@ -150,6 +184,10 @@ VulkanDebugMessenger& VulkanDebugMessenger::operator=(VulkanDebugMessenger&& oth
     return *this;
 }
 
+/// <summary>
+/// 保持しているハンドルを破棄する.
+/// 破棄済み・未生成のいずれでも安全に呼べる.
+/// </summary>
 void VulkanDebugMessenger::Destroy() noexcept
 {
     if (m_Messenger == VK_NULL_HANDLE)

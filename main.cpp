@@ -148,6 +148,10 @@ void Run()
 
 } // namespace
 
+/// <summary>
+/// アプリケーションのエントリーポイント.
+/// </summary>
+/// <returns>正常終了なら EXIT_SUCCESS、失敗なら EXIT_FAILURE.</returns>
 int main()
 {
     // NOTE:
