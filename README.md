@@ -10,7 +10,8 @@ Vulkan で三角形を描画する C++ 実装。Rust 実装は同リポジトリ
 | Vulkan SDK | 1.4.357.0 | `C:\VulkanSDK\1.4.357.0` |
 | GLFW | 3.4.0 | NuGet パッケージ（`packages.config` で管理） |
 
-構成は `Debug`・`Release` × `x64`・`Win32` の 4 通り。
+構成は `Debug`・`Release` × `x64` の 2 通り。32 bit（`Win32`）は用意していない。
+Vulkan SDK の 32 bit ライブラリが導入されておらず、対象環境も 64 bit だけのため。
 
 ## 環境構築手順
 
@@ -63,7 +64,7 @@ GLFW と違い Vulkan SDK は NuGet ではないので、`cpp.vcxproj` に参照
 ```xml
 <ItemDefinitionGroup>
   <ClCompile>
-    <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    <AdditionalIncludeDirectories>$(ProjectDir)src;$(VULKAN_SDK)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
   </ClCompile>
   <Link>
     <AdditionalDependencies>$(VULKAN_SDK)\Lib\vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -181,5 +182,5 @@ Vulkan・GLFW のコードと衝突しないようにしている。
 有効にしてあるので、保存すれば自動で適用される。手動で掛けるなら次を実行する。
 
 ```bash
-"C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/Llvm/x64/bin/clang-format.exe" -i main.cpp
+"C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/Llvm/x64/bin/clang-format.exe" -i src/main.cpp
 ```
